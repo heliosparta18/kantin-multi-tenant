@@ -10,31 +10,40 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // User Admin
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@kantin.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'status' => 'active',
-        ]);
+        // Admin
+        User::firstOrCreate(
+            ['email' => 'admin@kantin.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status' => 'active',
+            ]
+        );
 
-        // User Tenant (Pengelola Stan)
-        User::create([
-            'name' => 'Owner Stan Bakso',
-            'email' => 'tenant@kantin.com',
-            'password' => Hash::make('password'),
-            'role' => 'tenant',
-            'status' => 'active',
-        ]);
+        // User Tenant (Stan Bakso)
+        User::firstOrCreate(
+            ['email' => 'tenant@kantin.com'],
+            [
+                'name' => 'Owner Stan Bakso',
+                'password' => Hash::make('password'),
+                'role' => 'tenant',
+                'status' => 'active',
+            ]
+        );
 
-        // User Customer (Pembeli)
-        User::create([
-            'name' => 'Customer Pembeli',
-            'email' => 'customer@kantin.com',
-            'password' => Hash::make('password'),
-            'role' => 'customer',
-            'status' => 'active',
-        ]);
+        // User Customer
+        User::firstOrCreate(
+            ['email' => 'customer@kantin.com'],
+            [
+                'name' => 'Customer Pembeli',
+                'password' => Hash::make('password'),
+                'role' => 'customer',
+                'status' => 'active',
+            ]
+        );
+
+        // Panggil seeder kantin
+        $this->call(DemoCanteenSeeder::class);
     }
 }
