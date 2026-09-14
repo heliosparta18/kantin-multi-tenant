@@ -62,6 +62,11 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'dump' => [
+                'dump_binary_path' => 'C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin',
+                'use_single_transaction' => true,
+                'timeout' => 60 * 5,
+            ],
         ],
 
         'mariadb' => [
@@ -82,6 +87,11 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'dump' => [
+                'dump_binary_path' => 'C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin',
+                'use_single_transaction' => true,
+                'timeout' => 60 * 5,
+            ],
         ],
 
         'pgsql' => [
@@ -110,8 +120,6 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
     ],

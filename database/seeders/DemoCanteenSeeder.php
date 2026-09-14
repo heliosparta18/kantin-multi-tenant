@@ -40,6 +40,7 @@ class DemoCanteenSeeder extends Seeder
             [
                 'user_id' => $user1->id,
                 'name' => 'Stan Bakso Solo',
+                'slug' => 'stan-bakso-solo',
                 'bank_name' => 'BCA',
                 'bank_account_number' => '1234567890',
                 'bank_account_last4' => '7890',
@@ -53,6 +54,7 @@ class DemoCanteenSeeder extends Seeder
             [
                 'user_id' => $user2->id,
                 'name' => 'Stan Aneka Jus',
+                'slug' => 'stan-aneka-jus',
                 'bank_name' => 'BRI',
                 'bank_account_number' => '9876543210',
                 'bank_account_last4' => '3210',

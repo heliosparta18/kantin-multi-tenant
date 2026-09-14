@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
-class Commission extends Model
+class Withdrawal extends Model
 {
     use BelongsToTenant;
 
@@ -14,8 +14,7 @@ class Commission extends Model
     protected function casts(): array
     {
         return [
-            'percentage' => 'decimal:2',
-            'starts_at' => 'date',
+            'amount' => 'decimal:2',
         ];
     }
 }
