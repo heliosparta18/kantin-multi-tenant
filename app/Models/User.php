@@ -4,9 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,7 +26,6 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -54,6 +53,23 @@ class User extends Authenticatable
         'status',
     ];
 
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin'
+            || $this->canteenRoles()->whereIn('role', ['owner', 'manager', 'finance'])->exists();
+    }
+
+    public function isTenantOperator(): bool
+    {
+        return $this->role === 'tenant'
+            || $this->tenantRoles()->whereIn('role', ['owner', 'operator', 'cashier'])->exists();
+    }
+
     /**
      * Get the tenant owned by the user.
      *
@@ -62,6 +78,22 @@ class User extends Authenticatable
     public function tenant(): HasOne
     {
         return $this->hasOne(Tenant::class);
+    }
+
+    /**
+     * @return HasMany<UserCanteenRole, $this>
+     */
+    public function canteenRoles(): HasMany
+    {
+        return $this->hasMany(UserCanteenRole::class);
+    }
+
+    /**
+     * @return HasMany<UserTenantRole, $this>
+     */
+    public function tenantRoles(): HasMany
+    {
+        return $this->hasMany(UserTenantRole::class);
     }
 
     /**

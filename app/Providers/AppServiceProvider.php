@@ -11,6 +11,7 @@ use App\Policies\TenantOrderPolicy;
 use App\Policies\WithdrawalPolicy;
 use App\Support\Tenancy\TenantContext;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Order::class, TenantOrderPolicy::class);
         Gate::policy(TenantOrder::class, TenantOrderPolicy::class);
         Gate::policy(Withdrawal::class, WithdrawalPolicy::class);
+
+        Blade::component('layouts.admin', 'layouts.admin');
+        Blade::component('layouts.tenant', 'layouts.tenant');
+        Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
     }
 
     /**

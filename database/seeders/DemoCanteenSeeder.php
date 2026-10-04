@@ -5,11 +5,15 @@ namespace Database\Seeders;
 use App\Models\Canteen;
 use App\Models\Category;
 use App\Models\Commission;
+use App\Models\CommissionScheme;
 use App\Models\Menu;
 use App\Models\Modifier;
 use App\Models\Table;
 use App\Models\Tenant;
+use App\Models\TenantBalance;
 use App\Models\User;
+use App\Models\UserCanteenRole;
+use App\Models\UserTenantRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,6 +26,23 @@ class DemoCanteenSeeder extends Seeder
             ['code' => 'KANTIN-POLIWANGI'],
             ['name' => 'Kantin Terpadu Poliwangi', 'status' => 'active']
         );
+
+        // Admin demo -> pengelola (manager) Kantin Pusat.
+        foreach (['admin@kantin.test', 'admin@kantin.com'] as $email) {
+            $admin = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => 'Admin Kantin',
+                    'password' => Hash::make('password'),
+                    'role' => 'admin',
+                    'status' => 'active',
+                    'email_verified_at' => now(),
+                ]
+            );
+            UserCanteenRole::firstOrCreate(
+                ['user_id' => $admin->id, 'canteen_id' => $canteen->id, 'role' => 'manager'],
+            );
+        }
 
         // User Tenant 1 & 2
         $user1 = User::updateOrCreate(
@@ -40,6 +61,7 @@ class DemoCanteenSeeder extends Seeder
             [
                 'user_id' => $user1->id,
                 'name' => 'Stan Bakso Solo',
+                'display_name' => 'Stan Bakso Solo',
                 'slug' => 'stan-bakso-solo',
                 'bank_name' => 'BCA',
                 'bank_account_number' => '1234567890',
@@ -54,6 +76,7 @@ class DemoCanteenSeeder extends Seeder
             [
                 'user_id' => $user2->id,
                 'name' => 'Stan Aneka Jus',
+                'display_name' => 'Stan Aneka Jus',
                 'slug' => 'stan-aneka-jus',
                 'bank_name' => 'BRI',
                 'bank_account_number' => '9876543210',
@@ -62,6 +85,28 @@ class DemoCanteenSeeder extends Seeder
                 'status' => 'active',
             ]
         );
+
+        UserTenantRole::firstOrCreate(
+            ['user_id' => $user1->id, 'tenant_id' => $tenant1->id, 'role' => 'owner'],
+        );
+
+        UserTenantRole::firstOrCreate(
+            ['user_id' => $user2->id, 'tenant_id' => $tenant2->id, 'role' => 'owner'],
+        );
+
+        foreach ([$tenant1, $tenant2] as $t) {
+            TenantBalance::firstOrCreate(
+                ['tenant_id' => $t->id],
+                ['available_amount' => 0, 'held_amount' => 0]
+            );
+            CommissionScheme::firstOrCreate(
+                ['tenant_id' => $t->id, 'valid_to' => null],
+                [
+                    'commission_rate' => 0.1000,
+                    'valid_from' => now()->startOfYear(),
+                ]
+            );
+        }
 
         // Meja Kantin
         Table::updateOrCreate(

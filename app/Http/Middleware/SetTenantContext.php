@@ -48,7 +48,9 @@ class SetTenantContext
             abort(401, 'Unauthenticated.');
         }
 
-        $hasAccess = ($user->role === 'admin') || ($user->role === 'tenant' && (int) $tenant->user_id === (int) $user->id);
+        $hasAccess = ($user->role === 'admin')
+            || ($user->role === 'tenant' && (int) $tenant->user_id === (int) $user->id)
+            || $tenant->tenantRoles()->where('user_id', $user->id)->exists();
 
         if (! $hasAccess) {
             abort(403, 'User does not have access to this tenant.');

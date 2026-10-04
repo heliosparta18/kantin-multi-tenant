@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class Tenant extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $guarded = [];
 
     protected function casts(): array
@@ -20,11 +25,35 @@ class Tenant extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (Tenant $tenant): void {
-            if (empty($tenant->slug) && ! empty($tenant->name)) {
-                $tenant->slug = Str::slug($tenant->name);
+        static::saving(function (Tenant $tenant): void {
+            if (empty($tenant->attributes['name']) && ! empty($tenant->attributes['display_name'])) {
+                $tenant->attributes['name'] = $tenant->attributes['display_name'];
+            }
+            if (empty($tenant->attributes['display_name']) && ! empty($tenant->attributes['name'])) {
+                $tenant->attributes['display_name'] = $tenant->attributes['name'];
+            }
+            if (empty($tenant->attributes['slug'])) {
+                $src = $tenant->attributes['display_name'] ?? $tenant->attributes['name'] ?? null;
+                if ($src) {
+                    $tenant->attributes['slug'] = Str::slug($src);
+                }
             }
         });
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->attributes['display_name'] ?? $this->attributes['name'] ?? '';
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->attributes['name'] ?? $this->attributes['display_name'] ?? '';
     }
 
     /**
@@ -41,6 +70,38 @@ class Tenant extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return HasOne<TenantBalance, $this>
+     */
+    public function balance(): HasOne
+    {
+        return $this->hasOne(TenantBalance::class, 'tenant_id');
+    }
+
+    /**
+     * @return HasMany<CommissionScheme, $this>
+     */
+    public function commissionSchemes(): HasMany
+    {
+        return $this->hasMany(CommissionScheme::class);
+    }
+
+    /**
+     * @return HasMany<UserTenantRole, $this>
+     */
+    public function tenantRoles(): HasMany
+    {
+        return $this->hasMany(UserTenantRole::class);
+    }
+
+    /**
+     * @return HasMany<TenantBankAccount, $this>
+     */
+    public function bankAccounts(): HasMany
+    {
+        return $this->hasMany(TenantBankAccount::class);
     }
 
     /**

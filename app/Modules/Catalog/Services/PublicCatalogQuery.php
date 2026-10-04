@@ -2,6 +2,7 @@
 
 namespace App\Modules\Catalog\Services;
 
+use App\Models\Canteen;
 use App\Models\Menu;
 use App\Models\Tenant;
 use App\Models\User;
@@ -11,6 +12,16 @@ use Illuminate\Support\Facades\Log;
 
 class PublicCatalogQuery
 {
+    /**
+     * Get active menus for a specific canteen.
+     *
+     * @return Collection<int, Menu>
+     */
+    public function forCanteen(Canteen $canteen): Collection
+    {
+        return $this->getMenusForCanteen($canteen->id);
+    }
+
     /**
      * Get active menus for a specific canteen, bypassing tenant scope with mandatory substitute filters.
      *
